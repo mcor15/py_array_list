@@ -23,21 +23,22 @@ element and returns the olde element.
 class ArrayList:
 
     def __init__(self, capacity = 10):
-        self.count = 0
-        self.capacity = capacity
-        self.array = [None]*capacity #pseudo array
+        #Private fields
+        self.__count = 0
+        self.__capacity = capacity
+        self.__array = [None]*capacity #pseudo array
 
     def isEmpty(self):
-        return self.count == 0
+        return self.__count == 0
 
     def size(self):
-        return self.count
+        return self.__count
 
     def get(self, index):
-        if index >= self.count:
+        if index >= self.__count:
             raise IndexError("Index out of range.")
 
-        return self.array[index]
+        return self.__array[index]
 
     def add(self, element, index=None): 
 
@@ -47,36 +48,37 @@ class ArrayList:
             return
 
         #We're full. Create bigger array, copy elements, and add new element.
-        if self.count == self.capacity:
+        if self.__count == self.__capacity:
 
-            new_array = [None]*(self.capacity*2)
-            self.capacity = self.capacity*2
+            new_array = [None]*(self.__capacity*2)
+            self.__capacity = self.__capacity*2
         
             i = 0
-            while i < len(self.array):
-                new_array[i] = self.array[i]
+            while i < len(self.__array):
+                new_array[i] = self.__array[i]
                 i += 1
             new_array[i] = element
-            self.array = new_array
-            self.count +=1 
+            self.__array = new_array
+            self.__count +=1 
             
         #There is nothing in the array, add new element.
         elif self.isEmpty():
-            self.array[self.count] = element
-            self.count += 1
+            self.__array[self.__count] = element
+            self.__count += 1
         #There already is elements in the array, add new element.
         else:
-            self.array[self.count] = element
-            self.count += 1
+            self.__array[self.__count] = element
+            self.__count += 1
 
     def __add_at_index(self, element, index=None):
         
         #Do we have room to add one more element?
-        if self.count + 1 < self.capacity:
+        if self.__count + 1 < self.__capacity:
 
-            for i in range(self.count-1, index-1, -1):
-                self.array[i+1] = self.array[i]
-            self.array[index] = element
+            #Start from the back of the array and move the elements forward by 1. This will end at the index location for the new element.
+            for i in range(self.__count-1, index-1, -1):
+                self.__array[i+1] = self.__array[i]
+            self.__array[index] = element
 
 
 
@@ -87,10 +89,16 @@ class ArrayList:
         pass
 
     def set(self, index, element):
-        pass 
+        if index >= self.__count:
+            raise IndexError("Index out of range.")
+        
+        old_element = self.__array[index]
+        self.__array[index] = element
+        return old_element
 
-    def clear(self): 
-        pass
+    def clear(self):
+        self.__count = 0
+        self.__array = [None] * self.__capacity 
 
     def __str__(self):
         return ''

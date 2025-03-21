@@ -32,13 +32,12 @@ class TestArrayListMethods(unittest.TestCase):
         al.add(2)
         self.assertTrue(al.get(10) == 2)
 
-    def test_add_at_in_dex(self):
+    def test_add_at_index(self):
         data = [1,4,6,16]
         al = ArrayList()
         for e in data:
             al.add(e)
         al.add(7,2)
-        print(al.array)
         self.assertTrue(al.get(2) == 7)
 
 
