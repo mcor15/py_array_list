@@ -20,13 +20,23 @@ element and returns the olde element.
 • clear(): Removes all elements.
 '''
 
+class EmptyError(Exception):
+       def __init__(self, message):
+           self.message = message
+
+
+
 class ArrayList:
+
 
     def __init__(self, capacity = 10):
         #Private fields
         self.__count = 0
         self.__capacity = capacity
         self.__array = [None]*capacity #pseudo array
+
+    def __makeEmptyArray(self, size):
+        return [None]*(size)
 
     def isEmpty(self):
         return self.__count == 0
@@ -47,10 +57,11 @@ class ArrayList:
             self.__add_at_index(element, index)
             return
 
-        #We're full. Create bigger array, copy elements, and add new element.
+        #We're full. Create bigger array, copy elements, and add new element to the end.
         if self.__count == self.__capacity:
 
-            new_array = [None]*(self.__capacity*2)
+            #Double the capacity
+            new_array = self.__makeEmptyArray(self.__capacity*2)
             self.__capacity = self.__capacity*2
         
             i = 0
@@ -61,11 +72,11 @@ class ArrayList:
             self.__array = new_array
             self.__count +=1 
             
-        #There is nothing in the array, add new element.
+        #There is nothing in the array, add new element to the end.
         elif self.isEmpty():
             self.__array[self.__count] = element
             self.__count += 1
-        #There already is elements in the array, add new element.
+        #There already is elements in the array, add new element to the end.
         else:
             self.__array[self.__count] = element
             self.__count += 1
@@ -75,18 +86,59 @@ class ArrayList:
         #Do we have room to add one more element?
         if self.__count + 1 < self.__capacity:
 
-            #Start from the back of the array and move the elements forward by 1. This will end at the index location for the new element.
             for i in range(self.__count-1, index-1, -1):
                 self.__array[i+1] = self.__array[i]
             self.__array[index] = element
+            self.__count += 1
 
+        #We're full. Create bigger array, copy elements, and add new element at index.
+        else:
+            #Double the capacity
+            new_array = self.__makeEmptyArray(self.__capacity*2)
+            self.__capacity = self.__capacity*2
 
+            #Copy elements from old arry up to the index for new element and then copy the rest.
+            start = self.__count # +1 element -1 for indexing purposes
+            for i in range(start, -1, -1):
+                if i == index:
+                    new_array[i] = element
+                    self.__count += 1
+                else:
+                    new_array[i] = self.__array[i-1] #Accounting for added element 
+            self.__array = new_array
 
+                
     def remove(self, index=None):
-        pass
+
+        if self.isEmpty():
+            raise EmptyError("Cannot remove element from empty array.")
+
+        if index == None:
+            #Get last element on the array.
+            element = self.__array[self.__count-1]
+            self.__array[self.__count-1] = None
+            self.__count -= 1
+            #Return it.
+            return element
+        else:
+            return self.__remove_at_index(index)
 
     def __remove_at_index(self, index):
-        pass
+
+        element = None
+        found = False
+        print(self.__array)
+        for i in range(0, self.__count):
+            if i == index:
+                element = self.__array[i]
+                self.__count -= 1
+                found = True
+            elif found:
+                self.__array[i-1] = self.__array[i]
+        self.__array[self.__count] = None
+        print(self.__array)
+        return element
+
 
     def set(self, index, element):
         if index >= self.__count:
@@ -98,7 +150,7 @@ class ArrayList:
 
     def clear(self):
         self.__count = 0
-        self.__array = [None] * self.__capacity 
+        self.__array = self.__makeEmptyArray(self.__capacity)
 
     def __str__(self):
         return ''
