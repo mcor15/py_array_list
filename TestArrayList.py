@@ -128,6 +128,30 @@ class TestArrayListMethods(unittest.TestCase):
         element = al.remove(3)
         self.assertTrue(al.size() == 3 and element == 16 and al.get(0) == 1 and al.get(2) == 6)
 
+    def test_to_string(self):
+        data = [1,4,6,16]
+        al = ArrayList()
+        for e in data:
+            al.add(e)
+        self.assertTrue(str(data) == str(al))
+
+    def test_eq_py_list(self):
+        data = [1,4,6,16]
+        al = ArrayList()
+        for e in data:
+            al.add(e)
+        self.assertTrue(al == data)
+
+    def test_eq(self):
+        data = [1,4,6,16]
+        al = ArrayList()
+        al2 = ArrayList()
+        for e in data:
+            al.add(e)
+            al2.add(e)
+        self.assertTrue(al == al2)
+
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,58 +1,90 @@
 '''
 based on https://cs.pomona.edu/classes/cs62/assets/slides/L6-arraylists.pdf
-
-Standard Operations of ArrayList<E> class
-
-• ArrayList(): Constructs an empty ArrayList with an initial capacity of 2 (can vary across
-implementations, another common initial capacity is 10).
-• ArrayList(int capacity): Constructs an empty ArrayList with the specified initial capacity.
-• isEmpty(): Returns true if the ArrayList contains no elements.
-• size(): Returns the number of elements in the ArrayList.
-• get(int index): Returns the element at the specified index.
-• add(E element): Appends the element to the end of the ArrayList.
-• add(int index, E element): Inserts the element at the specified index and shifts the element
-currently at that position (if any) and any subsequent elements to the right (adds one to their indices).
-• E remove(): Removes and returns the element at the end of the ArrayList.
-• E remove(int index): Removes and returns the element at the specified index. Shifts any
-subsequent elements to the left (subtracts one from their indices).
-• E set(int index, E element): Replaces the element at the specified index with the specified
-element and returns the olde element.
-• clear(): Removes all elements.
 '''
 
 class EmptyError(Exception):
+       '''
+       Empty Error exception for when ArrayList is empty and an element is tried to be removed.
+       '''
        def __init__(self, message):
            self.message = message
 
 
-
 class ArrayList:
-
+    '''
+    A Python impelentation of the Array List data structure.
+    '''
 
     def __init__(self, capacity = 10):
+        '''
+        Constructor for ArrayList.
+
+        Parameters:
+            capacity (int): The starting size of the array list. Default 10 elements.
+        '''
         #Private fields
         self.__count = 0
         self.__capacity = capacity
         self.__array = [None]*capacity #pseudo array
 
     def __makeEmptyArray(self, size):
+        '''
+        Returns a empty pseudo array of provided size.
+        
+        Parameters:
+            size (int): Capacity of new internal array.
+
+        Returns:
+            list: Empty Python list filled with None.
+        '''
         return [None]*(size)
 
     def isEmpty(self):
+        '''
+        Checks is the Array List is empty.
+
+        Returns:
+            boolean: True if empty.
+        '''
         return self.__count == 0
 
     def size(self):
+        '''
+        Returns the number of elements in the Array List.
+
+        Returns:
+            int: The number of elemets in the Array List.
+        '''
         return self.__count
 
     def get(self, index):
-        if index >= self.__count:
+        '''
+        Returns the element at requested index.
+        
+        Parameters:
+            index (int): Location of element to be returned.
+
+        Returns:
+            T (type of stored element): Element stored at index requested.
+
+        Raises:
+            IndexError: If the Array List is empty or index is < 0.
+        '''
+        if index >= self.__count or index < 0:
             raise IndexError("Index out of range.")
 
         return self.__array[index]
 
     def add(self, element, index=None): 
-
-        #Call adding at a index version.
+        '''
+        Appends the provided element to the end of the Array List. If index is provided, insert at index and shift displaced
+        elements to the right.
+        
+        Parameters:
+            element (T - type of stored element)
+            index (int): (Optional) Location of where to put element. Default None.
+        '''
+        #Call adding at a index polymorphic version.
         if not index == None:
             self.__add_at_index(element, index)
             return
@@ -68,6 +100,8 @@ class ArrayList:
             while i < len(self.__array):
                 new_array[i] = self.__array[i]
                 i += 1
+
+            #Add new element.
             new_array[i] = element
             self.__array = new_array
             self.__count +=1 
@@ -82,8 +116,14 @@ class ArrayList:
             self.__count += 1
 
     def __add_at_index(self, element, index=None):
+        '''
+        Polymorphic version of add method. Insert at index and shift displaced elements to the right.
         
-        #Do we have room to add one more element?
+        Parameters:
+            element (T - type of stored element)
+            index (int): Location of where to put element. Default None.
+        '''
+        #Do we have room to add one more element? If yes, add it.
         if self.__count + 1 < self.__capacity:
 
             for i in range(self.__count-1, index-1, -1):
@@ -109,7 +149,21 @@ class ArrayList:
 
                 
     def remove(self, index=None):
+        '''
+        Removes the element at the end of the Array List and return it. If index is provided, remove
+        the element at that index, shift elements from the left, return element.
+        
+        Parameters:
+            index (int): (Optional) Location of element to be returned.
 
+        Returns:
+            T (type of stored element): Element stored at index requested.
+
+        Raises:
+            EmptyError: If the Array List is empty.
+            IndexError: If index is < 0 or greater than the number of elements -1.
+        '''
+        #We are empty.
         if self.isEmpty():
             raise EmptyError("Cannot remove element from empty array.")
 
@@ -121,27 +175,51 @@ class ArrayList:
             #Return it.
             return element
         else:
+            #Index is geater than the number of elements in the Array List.
+            if index >= self.__count or index < 0:
+                raise IndexError("Index out of range.")
             return self.__remove_at_index(index)
 
     def __remove_at_index(self, index):
+        '''
+        Polymorphic version of remove method. Removes the element at that index, shift elements from the left, return element.
+        
+        Parameters:
+            index (int): (Optional) Location of element to be returned.
 
+        Returns:
+            T (type of stored element): Element stored at index requested.
+
+        '''
         element = None
         found = False
-        print(self.__array)
+
         for i in range(0, self.__count):
+            #Continue until we get to the index. 
             if i == index:
+                #Remove the element.
                 element = self.__array[i]
                 self.__count -= 1
                 found = True
             elif found:
+                #Shift the remaining elements left.
                 self.__array[i-1] = self.__array[i]
         self.__array[self.__count] = None
-        print(self.__array)
         return element
 
 
     def set(self, index, element):
-        if index >= self.__count:
+        '''
+        Replace element at index.
+        
+        Parameters:
+            index (int): Location of element to be replaced.
+            element (T - type of stored element)
+
+        Raises:
+            IndexError: If index is < 0 or greater than the number of elements -1.
+        '''
+        if index >= self.__count or index < 0:
             raise IndexError("Index out of range.")
         
         old_element = self.__array[index]
@@ -149,14 +227,49 @@ class ArrayList:
         return old_element
 
     def clear(self):
+        '''
+        Clears all the elements in the Array List, maintains the current capacity.
+        '''
         self.__count = 0
         self.__array = self.__makeEmptyArray(self.__capacity)
 
     def __str__(self):
-        return ''
+        if self.isEmpty():
+            return '[]'
+        
+        if self.__count == 1:
+            return '[{}]'.format(str(self.__array[0]))
+        
+        str_of_array = []
+        str_of_array.append('[')
+        for e in range(0, self.__count):
+            str_of_array.append(str(self.__array[e]))
+            str_of_array.append(', ')
+        
+        str_of_array.pop()
+        str_of_array.append(']')
 
-    def __eq__(self):
-        return False
+        return ''.join(str_of_array)
+
+    def __eq__(self, other):
+        if isinstance(other, ArrayList):
+            if not other.__count == self.__count:
+                return False
+            else:
+                for i in range(0, self.__count):
+                    if not other.__array[i] == self.__array[i]:
+                        return False
+                return True
+        elif isinstance(other, list):
+            if not len(other) == self.__count:
+                return False
+            else:
+                for i in range(0, self.__count):
+                    if not other[i] == self.__array[i]:
+                        return False
+                return True
+        else:
+            return NotImplemented
 
     
 
