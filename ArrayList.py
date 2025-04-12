@@ -270,8 +270,17 @@ class ArrayList:
                 return True
         else:
             return NotImplemented
-
-    
+        
+    def __iter__(self):
+        self.index = 0
+        return self
+    def __next__(self):
+        i = self.index
+        if i < self.__count:
+            self.index += 1
+            return self.__array[i]
+        else:
+            raise StopIteration
 
 
 
